@@ -59,20 +59,6 @@ class Job extends JenkinsEntity {
      */
     protected $keepDependencies;
 
-    protected $lastBuild;
-
-    protected $lastCompleteBuild;
-
-    protected $lastFailedBuild;
-
-    protected $lastStableBuild;
-
-    protected $lastSuccessfulBuild;
-
-    protected $lastUnstableBuild;
-
-    protected $lastUnsuccessfulBuild;
-
     /**
      * @var integer
      */
@@ -151,12 +137,86 @@ class Job extends JenkinsEntity {
     }
 
     /**
+     * @param int $id
+     * @return Build
+     */
+    public function getBuild(int $id): Build {
+        return new Build($this->getApiAccessor(), $this, $id);
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getFirstBuild() {
+        return Job::getBuildFromJson($this, "firstBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastBuild() {
+        return Job::getBuildFromJson($this, "lastBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastCompletedBuild() {
+        return Job::getBuildFromJson($this, "lastCompletedBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastFailedBuild() {
+        return Job::getBuildFromJson($this, "lastFailedBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastStableBuild() {
+        return Job::getBuildFromJson($this, "lastStableBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastSuccessful() {
+        return Job::getBuildFromJson($this, "lastSuccessfulBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastUnstableBuild() {
+        return Job::getBuildFromJson($this, "lastUnstableBuild");
+    }
+
+    /**
+     * @return null|Build
+     */
+    public function getLastUnsuccessfulBuild() {
+        return Job::getBuildFromJson($this, "lastUnsuccessfulBuild");
+    }
+
+    /**
      * @return int
      */
     public function getNextBuildNumber(): int {
         return $this->nextBuildNumber;
     }
 
+    /**
+     * @param Job $job
+     * @param $jsonKey
+     * @return null|Build
+     */
+    private static function getBuildFromJson(job $job, $jsonKey) {
+        $buildObj = $job->getData()->get($jsonKey);
 
+        if (empty($buildObj)) return null;
+        return new Build($job->getApiAccessor(), $job, $buildObj->number);
+    }
 
 }

@@ -15,8 +15,8 @@ class JsonData {
         return $this->data;
     }
 
-    public function get(string $key) {
-        return isset($this->data->$key) ? $this->data->$key : "";
+    public function get(string $key, $defaultValue = '') {
+        return isset($this->data->$key) ? $this->data->$key : $defaultValue;
     }
 
 }

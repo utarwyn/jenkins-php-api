@@ -3,6 +3,7 @@
 namespace Utarwyn\Jenkins;
 
 use Utarwyn\Jenkins\Entity\Job;
+use Utarwyn\Jenkins\Entity\UserManager;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
 
@@ -56,6 +57,11 @@ class Jenkins extends JenkinsEntity {
      * @var boolean
      */
     protected $useCrumbs;
+
+    /**
+     * @var UserManager
+     */
+    private $userManager;
 
     /**
      * @var boolean
@@ -137,31 +143,39 @@ class Jenkins extends JenkinsEntity {
     /**
      * @return bool
      */
-    public function isQuietingDown(): bool{
+    public function isQuietingDown(): bool {
         return $this->quietingDown;
     }
 
     /**
      * @return int
      */
-    public function getSlaveAgentPort(): int{
+    public function getSlaveAgentPort(): int {
         return $this->slaveAgentPort;
     }
 
     /**
      * @return bool
      */
-    public function isUsingCrumbs(): bool{
+    public function isUsingCrumbs(): bool {
         return $this->useCrumbs;
+    }
+
+    /**
+     * @return UserManager
+     */
+    public function getUserManager(): UserManager {
+        if (is_null($this->userManager))
+            $this->userManager = new UserManager($this->getApiAccessor());
+
+        return $this->userManager;
     }
 
     /**
      * @return bool
      */
-    public function isUsingSecurity(): bool{
+    public function isUsingSecurity(): bool {
         return $this->useSecurity;
     }
-
-
 
 }

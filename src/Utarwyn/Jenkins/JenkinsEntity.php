@@ -9,12 +9,22 @@ use Utarwyn\Jenkins\Server\ApiAccessor;
 abstract class JenkinsEntity {
 
     /**
+     * @var ApiAccessor
+     */
+    private $apiAccessor;
+
+    /**
      * @var JsonData The API data of this entity.
      */
     private $data;
 
     public function __construct(ApiAccessor $apiAccessor, string $objectAction) {
+        $this->apiAccessor = $apiAccessor;
         $this->loadData($apiAccessor, $objectAction);
+    }
+
+    protected function getApiAccessor() {
+        return $this->apiAccessor;
     }
 
     protected function getData() {
@@ -26,7 +36,9 @@ abstract class JenkinsEntity {
 
         foreach (get_object_vars($this) as $variable => $value) {
             if ($variable === "data") continue;
-            $this->$variable = $this->data->get($variable);
+
+            $defValue = (isset($this->$variable)) ? $this->$variable : "";
+            $this->$variable = $this->data->get($variable, $defValue);
         }
     }
 

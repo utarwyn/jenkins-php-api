@@ -68,6 +68,7 @@ class ApiAccessor {
      * @return string Endpoint of the action asked in parameter.
      */
     private function getActionEndpoint(string $action): string {
+        $action = trim($action, "/");
         return "{$this->jenkinsUrl}/$action/api/json";
     }
 
@@ -75,12 +76,12 @@ class ApiAccessor {
         if (!is_null($this->jenkinsCrumbData))
             return $this->jenkinsCrumbData;
 
-        $reponse = $this->client->get($this->getActionEndpoint("crumbIssuer"), array(
+        $response = $this->client->get($this->getActionEndpoint("crumbIssuer"), array(
             "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken]
         ));
 
-        if ($reponse->getStatusCode() === 200) {
-            $data = \GuzzleHttp\json_decode($reponse->getBody()->getContents());
+        if ($response->getStatusCode() === 200) {
+            $data = \GuzzleHttp\json_decode($response->getBody()->getContents());
             $crumb = new CrumbData($data->crumbRequestField, $data->crumb);
 
             $this->jenkinsCrumbData = $crumb;
