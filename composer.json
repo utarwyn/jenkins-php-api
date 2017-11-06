@@ -1,0 +1,30 @@
+{
+    "name": "utarwyn/jenkins-php-api",
+    "description": "A complete PHP API for Jenkins CI.",
+    "type": "library",
+    "keywords": ["jenkins", "ci", "api", "php", "web"],
+    "version": "0.0.1",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Utarwyn",
+            "email": "contact@utarwyn.fr"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/utarwyn/jenkins-php-api",
+        "issues": "https://github.com/utarwyn/jenkins-php-api/issues"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utarwyn\\": "src/Utarwyn"
+        }
+    },
+    "require": {
+        "php": ">=7.0",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*"
+    }
+}
