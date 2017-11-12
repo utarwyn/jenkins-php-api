@@ -9,6 +9,11 @@ use Utarwyn\Jenkins\Server\ApiAccessor;
 class Build extends JenkinsEntity {
 
     /**
+     * @var Project project
+     */
+    private $project;
+
+    /**
      * @var boolean
      */
     protected $building;
@@ -78,8 +83,9 @@ class Build extends JenkinsEntity {
      */
     protected $builtOn;
 
-    public function __construct(ApiAccessor $apiAccessor, Job $job, int $buildId) {
-        parent::__construct($apiAccessor, "job/{$job->getName()}/$buildId");
+    public function __construct(Project $project, int $buildId) {
+        parent::__construct("job/{$project->getName()}/$buildId");
+        $this->project = $project;
     }
 
     /**
@@ -178,6 +184,13 @@ class Build extends JenkinsEntity {
      */
     public function getBuiltOn(): string {
         return $this->builtOn;
+    }
+
+    /*
+     * @return string
+     */
+    public function getConsoleOutput() {
+        return ApiAccessor::getInstance()->get("job/{$this->project->getName()}/{$this->id}/consoleText", true);
     }
 
 }

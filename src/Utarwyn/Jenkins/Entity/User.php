@@ -2,9 +2,9 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
-
 use Utarwyn\Jenkins\JenkinsEntity;
 use Utarwyn\Jenkins\Server\ApiAccessor;
+
 
 class User extends JenkinsEntity {
 
@@ -28,10 +28,14 @@ class User extends JenkinsEntity {
      */
     protected $id;
 
+    /**
+     * @var Project[] All views of the user.
+     */
+    private $views;
 
-    public function __construct(ApiAccessor $apiAccessor, $userObj) {
-        var_dump($userObj);
-        parent::__construct($apiAccessor, "user/$name");
+
+    public function __construct(\StdClass $userObj) {
+        parent::__construct("user/{$userObj->user->fullName}");
 
         // Init user properties
         foreach ($this->getData()->get("property") as $property)
@@ -68,6 +72,30 @@ class User extends JenkinsEntity {
         return $this->id;
     }
 
+    /*
+     * @return Project[] Views of the user.
+     */
+    public function getViews() {
+        if (!is_null($this->views))
+            return $this->views;
 
+        $viewsJson = ApiAccessor::getInstance()->get("user/{$this->id}/my-views");
+
+        foreach ($viewsJson->get("jobs") as $job)
+            $this->views[] = new Project($job->name);
+
+        return $this->views;
+    }
+
+    /**
+     * @return int Number of views for the current user.
+     */
+    public function getViewNb(): int {
+        if (!is_null($this->views))
+            return count($this->views);
+
+        $viewsJson = ApiAccessor::getInstance()->get("user/{$this->id}/my-views");
+        return count($viewsJson->get("jobs"));
+    }
 
 }

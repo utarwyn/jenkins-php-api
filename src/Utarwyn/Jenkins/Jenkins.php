@@ -2,16 +2,18 @@
 
 namespace Utarwyn\Jenkins;
 
-use Utarwyn\Jenkins\Entity\Job;
+use Utarwyn\Jenkins\Entity\PluginManager;
+use Utarwyn\Jenkins\Entity\Project;
 use Utarwyn\Jenkins\Entity\UserManager;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
 
 class Jenkins extends JenkinsEntity {
+
     /**
-     * @var ApiAccessor Class to manage the connection at the Jenkins API.
+     * @var string
      */
-    private $apiClient;
+    protected $description;
 
     /**
      * @var string
@@ -34,14 +36,14 @@ class Jenkins extends JenkinsEntity {
     protected $numExecutors;
 
     /**
-     * @var string
+     * @var PluginManager
      */
-    protected $description;
+    private $pluginManager;
 
     /**
-     * @var Job[]
+     * @var Project[]
      */
-    protected $jobs;
+    protected $projects;
 
     /**
      * @var boolean
@@ -69,8 +71,15 @@ class Jenkins extends JenkinsEntity {
     protected $useSecurity;
 
     public function __construct(string $serverUrl, string $username, $apiToken) {
-        $this->apiClient = new ApiAccessor($serverUrl, $username, $apiToken);
-        parent::__construct($this->apiClient, "");
+        ApiAccessor::init($serverUrl, $username, $apiToken);
+        parent::__construct("");
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string{
+        return $this->description;
     }
 
     /**
@@ -102,40 +111,43 @@ class Jenkins extends JenkinsEntity {
     }
 
     /**
-     * @return string
+     * @return PluginManager
      */
-    public function getDescription(): string{
-        return $this->description;
+    public function getPluginManager(): PluginManager {
+        if (is_null($this->pluginManager))
+            $this->pluginManager = new PluginManager();
+
+        return $this->pluginManager;
     }
 
     /**
-     * @return Job[]
+     * @return Project[]
      */
-    public function getJobs(): array {
-        $jsonJobs = $this->getData()->get("jobs");
-        $jobs     = array();
+    public function getProjects(): array {
+        $jsonProjects = $this->getData()->get("jobs");
+        $projects     = array();
 
-        foreach($jsonJobs as $job)
-            array_push($jobs, new Job($this->apiClient, $job->name));
+        foreach($jsonProjects as $project)
+            array_push($projects, new Project($project->name));
 
-        return $jobs;
+        return $projects;
     }
 
     /**
      * @return int
      */
-    public function getJobsNb(): int {
+    public function getProjectsNb(): int {
         return count($this->getData()->get("jobs"));
     }
 
     /**
-     * @param string $jobName
-     * @return Job|null
+     * @param string $projectName
+     * @return Project|null
      */
-    public function getJob(string $jobName) {
-        foreach($this->getData()->get("jobs") as $job)
-            if ($job->name === $jobName)
-                return new Job($this->apiClient, $job->name);
+    public function getProject(string $projectName) {
+        foreach($this->getData()->get("jobs") as $project)
+            if ($project->name === $projectName)
+                return new Project($project->name);
 
         return null;
     }
@@ -166,7 +178,7 @@ class Jenkins extends JenkinsEntity {
      */
     public function getUserManager(): UserManager {
         if (is_null($this->userManager))
-            $this->userManager = new UserManager($this->getApiAccessor());
+            $this->userManager = new UserManager();
 
         return $this->userManager;
     }
@@ -176,6 +188,13 @@ class Jenkins extends JenkinsEntity {
      */
     public function isUsingSecurity(): bool {
         return $this->useSecurity;
+    }
+
+    /**
+     * @return string Version of the Jenkins server.
+     */
+    public function getVersion() {
+        return ApiAccessor::getInstance()->getJenkinsVersion();
     }
 
 }

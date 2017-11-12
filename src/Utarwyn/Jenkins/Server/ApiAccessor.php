@@ -3,10 +3,13 @@
 namespace Utarwyn\Jenkins\Server;
 
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 use Utarwyn\Jenkins\Helper\JsonData;
 
 
 class ApiAccessor {
+
+    private static $instance;
 
     /**
      * @var string URL of Jenkins server.
@@ -29,6 +32,11 @@ class ApiAccessor {
     private $jenkinsCrumbData;
 
     /**
+     * @var string Version of the Jenkins server.
+     */
+    private $jenkinsVersion;
+
+    /**
      * @var Client HTTP Client to access to the API.
      */
     private $client;
@@ -41,25 +49,48 @@ class ApiAccessor {
         $this->client = new Client();
     }
 
-    public function request(string $method, string $action, array $params = array()) : JsonData {
+    /**
+     * @param string $action
+     * @param bool $plain
+     * @return null|string|JsonData
+     */
+    public function get(string $action, bool $plain = false) {
+        $response = $this->request("GET", $action);
+
+        // Version header.
+        if (is_null($this->jenkinsVersion) && $response->hasHeader("x-jenkins"))
+            $this->jenkinsVersion = $response->getHeader("x-jenkins")[0];
+
+        if ($response->getStatusCode() === 200) {
+            $content = $response->getBody()->getContents();
+            return ($plain) ? $content : new JsonData($content);
+        }
+
+        return null;
+    }
+
+    public function post(string $action, array $params = array()): bool {
+        $response = $this->request("POST", $action, $params);
+
+        var_dump($response);
+        return true;
+    }
+
+    public function getJenkinsVersion() {
+        return $this->jenkinsVersion;
+    }
+
+    private function request(string $method, string $action, array $params = array()) : ResponseInterface {
         // Get crumb data to securise the request
         $crumb = $this->getCrumbData();
 
-        $response = $this->client->request($method, $this->getActionEndpoint($action), array(
+        return $this->client->request($method, $this->getActionEndpoint($action), array(
             "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken],
             "headers" => array(
                 $crumb->getRequestField(), $crumb->getCrumb()
             ),
-            "query" => $params
+            "form_params" => $params
         ));
-
-        if ($response->getStatusCode() === 200) {
-            return new JsonData($response->getBody()->getContents());
-        } else {
-
-        }
-
-        return null;
     }
 
     /**
@@ -69,7 +100,19 @@ class ApiAccessor {
      */
     private function getActionEndpoint(string $action): string {
         $action = trim($action, "/");
-        return "{$this->jenkinsUrl}/$action/api/json";
+        $params = "";
+
+        // Add parameters add the end.
+        if (strpos($action, "?") !== false) {
+            $sp = preg_split("/\?/", $action, 2);
+
+            $params = "?" . $sp[1];
+            $action = trim($sp[0], "/");
+        }
+
+        if (!empty($action)) $action .= "/";
+
+        return "{$this->jenkinsUrl}/{$action}api/json$params";
     }
 
     private function getCrumbData() : CrumbData {
@@ -91,6 +134,17 @@ class ApiAccessor {
         }
 
         return null;
+    }
+
+    public static function init(string $jenkinsUrl, string $username, string $apiToken): ApiAccessor {
+        if (is_null(self::$instance))
+            self::$instance = new ApiAccessor($jenkinsUrl, $username, $apiToken);
+
+        return self::$instance;
+    }
+
+    public static function getInstance(): ApiAccessor {
+        return self::$instance;
     }
 
 }

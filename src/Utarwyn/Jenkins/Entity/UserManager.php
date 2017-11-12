@@ -12,8 +12,8 @@ class UserManager extends JenkinsEntity {
      */
     protected $users;
 
-    public function __construct($apiAccessor) {
-        parent::__construct($apiAccessor, "asynchPeople");
+    public function __construct() {
+        parent::__construct("asynchPeople");
     }
 
     /**
@@ -48,7 +48,7 @@ class UserManager extends JenkinsEntity {
                 $userObj = $user;
 
         if ($userObj == null) return null;
-        return new User($this->getApiAccessor(), $userObj);
+        return new User($userObj);
     }
 
 }

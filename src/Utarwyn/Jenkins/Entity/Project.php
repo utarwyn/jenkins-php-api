@@ -2,11 +2,10 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
-
 use Utarwyn\Jenkins\JenkinsEntity;
-use Utarwyn\Jenkins\Server\ApiAccessor;
 
-class Job extends JenkinsEntity {
+
+class Project extends JenkinsEntity {
 
     /**
      * @var string
@@ -69,8 +68,8 @@ class Job extends JenkinsEntity {
      */
     protected $concurrentBuild;
 
-    public function __construct(ApiAccessor $apiAccessor, string $name) {
-        parent::__construct($apiAccessor, "job/$name");
+    public function __construct(string $name) {
+        parent::__construct("job/$name");
     }
 
     /**
@@ -141,63 +140,63 @@ class Job extends JenkinsEntity {
      * @return Build
      */
     public function getBuild(int $id): Build {
-        return new Build($this->getApiAccessor(), $this, $id);
+        return new Build($this, $id);
     }
 
     /**
      * @return null|Build
      */
     public function getFirstBuild() {
-        return Job::getBuildFromJson($this, "firstBuild");
+        return Project::getBuildFromJson($this, "firstBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastBuild() {
-        return Job::getBuildFromJson($this, "lastBuild");
+        return Project::getBuildFromJson($this, "lastBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastCompletedBuild() {
-        return Job::getBuildFromJson($this, "lastCompletedBuild");
+        return Project::getBuildFromJson($this, "lastCompletedBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastFailedBuild() {
-        return Job::getBuildFromJson($this, "lastFailedBuild");
+        return Project::getBuildFromJson($this, "lastFailedBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastStableBuild() {
-        return Job::getBuildFromJson($this, "lastStableBuild");
+        return Project::getBuildFromJson($this, "lastStableBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastSuccessful() {
-        return Job::getBuildFromJson($this, "lastSuccessfulBuild");
+        return Project::getBuildFromJson($this, "lastSuccessfulBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastUnstableBuild() {
-        return Job::getBuildFromJson($this, "lastUnstableBuild");
+        return Project::getBuildFromJson($this, "lastUnstableBuild");
     }
 
     /**
      * @return null|Build
      */
     public function getLastUnsuccessfulBuild() {
-        return Job::getBuildFromJson($this, "lastUnsuccessfulBuild");
+        return Project::getBuildFromJson($this, "lastUnsuccessfulBuild");
     }
 
     /**
@@ -208,15 +207,15 @@ class Job extends JenkinsEntity {
     }
 
     /**
-     * @param Job $job
+     * @param Project $project
      * @param $jsonKey
      * @return null|Build
      */
-    private static function getBuildFromJson(job $job, $jsonKey) {
-        $buildObj = $job->getData()->get($jsonKey);
+    private static function getBuildFromJson(Project $project, $jsonKey) {
+        $buildObj = $project->getData()->get($jsonKey);
 
         if (empty($buildObj)) return null;
-        return new Build($job->getApiAccessor(), $job, $buildObj->number);
+        return new Build($project, $buildObj->number);
     }
 
 }
