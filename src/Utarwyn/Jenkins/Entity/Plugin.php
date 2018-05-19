@@ -2,8 +2,8 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
-
-class Plugin {
+class Plugin
+{
 
     /**
      * @var bool
@@ -80,112 +80,128 @@ class Plugin {
      */
     protected $version;
 
-    public function __construct($jsonData) {
+    public function __construct($jsonData)
+    {
         $this->loadData($jsonData);
     }
 
     /**
      * @return bool
      */
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         return $this->active;
     }
 
     /**
      * @return null|string
      */
-    public function getBackupVersion() {
+    public function getBackupVersion()
+    {
         return $this->backupVersion;
     }
 
     /**
      * @return bool
      */
-    public function isBundled(): bool {
+    public function isBundled(): bool
+    {
         return $this->bundled;
     }
 
     /**
      * @return bool
      */
-    public function isDeleted(): bool {
+    public function isDeleted(): bool
+    {
         return $this->deleted;
     }
 
     /**
      * @return mixed
      */
-    public function getDependencies() {
+    public function getDependencies()
+    {
         return $this->dependencies;
     }
 
     /**
      * @return bool
      */
-    public function isDowngradable(): bool {
+    public function isDowngradable(): bool
+    {
         return $this->downgradable;
     }
 
     /**
      * @return bool
      */
-    public function isEnabled(): bool {
+    public function isEnabled(): bool
+    {
         return $this->enabled;
     }
 
     /**
      * @return bool
      */
-    public function isHasUpdate(): bool {
+    public function isHasUpdate(): bool
+    {
         return $this->hasUpdate;
     }
 
     /**
      * @return string
      */
-    public function getLongName(): string {
+    public function getLongName(): string
+    {
         return $this->longName;
     }
 
     /**
      * @return bool
      */
-    public function isPinned(): bool {
+    public function isPinned(): bool
+    {
         return $this->pinned;
     }
 
     /**
      * @return string
      */
-    public function getRequiredCoreVersion(): string {
+    public function getRequiredCoreVersion(): string
+    {
         return $this->requiredCoreVersion;
     }
 
     /**
      * @return string
      */
-    public function getShortName(): string {
+    public function getShortName(): string
+    {
         return $this->shortName;
     }
 
     /**
      * @return bool
      */
-    public function isSupportsDynamicLoad(): bool {
+    public function isSupportsDynamicLoad(): bool
+    {
         return $this->supportsDynamicLoad;
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string {
+    public function getUrl(): string
+    {
         return $this->url;
     }
 
     /**
      * @return string
      */
-    public function getVersion(): string {
+    public function getVersion(): string
+    {
         return $this->version;
     }
 
@@ -193,9 +209,10 @@ class Plugin {
      * Allows to create the Plugin object from a JSON Object.
      * @param $jsonData \StdClass The JSON data.
      */
-    private function loadData($jsonData) {
-        foreach (get_object_vars($this) as $variable => $value)
+    private function loadData($jsonData)
+    {
+        foreach (get_object_vars($this) as $variable => $value) {
             $this->$variable = $jsonData->$variable;
+        }
     }
-
 }

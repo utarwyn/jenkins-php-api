@@ -6,7 +6,8 @@ namespace Utarwyn\Jenkins\Server;
  * Class CrumbData
  * @package Utarwyn\Jenkins\Server
  */
-class CrumbData {
+class CrumbData
+{
 
     /**
      * @var string The requested HTTP field header to validate the crumb.
@@ -23,7 +24,8 @@ class CrumbData {
      * @param string $requestField
      * @param string $crumb
      */
-    public function __construct(string $requestField, string $crumb) {
+    public function __construct(string $requestField, string $crumb)
+    {
         $this->requestField = $requestField;
         $this->crumb = $crumb;
     }
@@ -31,16 +33,16 @@ class CrumbData {
     /**
      * @return string The requested HTTP field header to validate the crumb.
      */
-    public function getRequestField(): string {
+    public function getRequestField(): string
+    {
         return $this->requestField;
     }
 
     /**
      * @return string The crumb to validate the request (CSRF protection).
      */
-    public function getCrumb(): string {
+    public function getCrumb(): string
+    {
         return $this->crumb;
     }
-
-
 }

@@ -2,8 +2,8 @@
 
 namespace Utarwyn\Jenkins\Helper;
 
-
-class JsonData {
+class JsonData
+{
 
     /**
      * @var string The plain data (string) of the JSON.
@@ -19,7 +19,8 @@ class JsonData {
      * JsonData constructor.
      * @param $jsonData string The plain text JSON data to analyze.
      */
-    public function __construct($jsonData) {
+    public function __construct($jsonData)
+    {
         $this->plain = $jsonData;
         $this->data = json_decode($this->plain);
     }
@@ -27,14 +28,16 @@ class JsonData {
     /**
      * @return string The plain text JSON.
      */
-    public function getPlainJSON() {
+    public function getPlainJSON()
+    {
         return $this->plain;
     }
 
     /**
      * @return \StdClass Get all the json data.
      */
-    public function getAll() {
+    public function getAll()
+    {
         return $this->data;
     }
 
@@ -43,8 +46,8 @@ class JsonData {
      * @param string $defaultValue The default value if the value wasn't found.
      * @return mixed
      */
-    public function get(string $key, $defaultValue = '') {
+    public function get(string $key, $defaultValue = '')
+    {
         return isset($this->data->$key) ? $this->data->$key : $defaultValue;
     }
-
 }

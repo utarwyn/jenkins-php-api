@@ -5,8 +5,8 @@ namespace Utarwyn\Jenkins\Entity;
 use Utarwyn\Jenkins\JenkinsEntity;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
-
-class Build extends JenkinsEntity {
+class Build extends JenkinsEntity
+{
 
     /**
      * @var Project project
@@ -83,7 +83,8 @@ class Build extends JenkinsEntity {
      */
     protected $builtOn;
 
-    public function __construct(Project $project, int $buildId) {
+    public function __construct(Project $project, int $buildId)
+    {
         parent::__construct("job/{$project->getName()}/$buildId");
         $this->project = $project;
     }
@@ -91,106 +92,120 @@ class Build extends JenkinsEntity {
     /**
      * @return bool
      */
-    public function isBuilding(): bool {
+    public function isBuilding(): bool
+    {
         return $this->building;
     }
 
     /**
      * @return string
      */
-    public function getDescription(): string {
+    public function getDescription(): string
+    {
         return $this->description;
     }
 
     /**
      * @return string
      */
-    public function getDisplayName(): string {
+    public function getDisplayName(): string
+    {
         return $this->displayName;
     }
 
     /**
      * @return int
      */
-    public function getDuration(): int {
+    public function getDuration(): int
+    {
         return $this->duration;
     }
 
     /**
      * @return int
      */
-    public function getEstimatedDuration(): int {
+    public function getEstimatedDuration(): int
+    {
         return $this->estimatedDuration;
     }
 
     /**
      * @return string
      */
-    public function getFullDisplayName(): string {
+    public function getFullDisplayName(): string
+    {
         return $this->fullDisplayName;
     }
 
     /**
      * @return int
      */
-    public function getId(): int {
+    public function getId(): int
+    {
         return $this->id;
     }
 
     /**
      * @return bool
      */
-    public function isKeepingLog(): bool {
+    public function isKeepingLog(): bool
+    {
         return $this->keepLog;
     }
 
     /**
      * @return int
      */
-    public function getNumber(): int {
+    public function getNumber(): int
+    {
         return $this->number;
     }
 
     /**
      * @return int
      */
-    public function getQueueId(): int {
+    public function getQueueId(): int
+    {
         return $this->queueId;
     }
 
     /**
      * @return BuildResult
      */
-    public function getResult() {
+    public function getResult()
+    {
         return BuildResult::fromResult($this->result);
     }
 
     /**
      * @return int
      */
-    public function getTimestamp(): int {
+    public function getTimestamp(): int
+    {
         return $this->timestamp;
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string {
+    public function getUrl(): string
+    {
         return $this->url;
     }
 
     /**
      * @return string
      */
-    public function getBuiltOn(): string {
+    public function getBuiltOn(): string
+    {
         return $this->builtOn;
     }
 
     /*
      * @return string
      */
-    public function getConsoleOutput() {
+    public function getConsoleOutput()
+    {
         return ApiAccessor::getInstance()->get("job/{$this->project->getName()}/{$this->id}/consoleText", true);
     }
-
 }

@@ -1,0 +1,10 @@
+parameters:
+  git_dir: .
+  bin_dir: vendor/bin
+  ascii:
+    failed: ~
+    succeeded: ~
+  tasks:
+    phplint: ~
+    phpcsfixer: ~
+    phpunit: ~

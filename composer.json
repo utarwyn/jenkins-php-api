@@ -8,7 +8,7 @@
     "authors": [
         {
             "name": "Utarwyn",
-            "email": "contact@utarwyn.fr"
+            "email": "maxime.malgorn@laposte.net"
         }
     ],
     "support": {
@@ -21,10 +21,13 @@
         }
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "guzzlehttp/guzzle": "^6.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.1.*"
+        "phpunit/phpunit": "^7.1",
+        "phpro/grumphp": "^0.14.0",
+        "jakub-onderka/php-parallel-lint": "^1.0",
+        "friendsofphp/php-cs-fixer": "^2.11"
     }
 }

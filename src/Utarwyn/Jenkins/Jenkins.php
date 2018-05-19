@@ -7,8 +7,8 @@ use Utarwyn\Jenkins\Entity\Project;
 use Utarwyn\Jenkins\Entity\UserManager;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
-
-class Jenkins extends JenkinsEntity {
+class Jenkins extends JenkinsEntity
+{
 
     /**
      * @var string
@@ -70,7 +70,8 @@ class Jenkins extends JenkinsEntity {
      */
     protected $useSecurity;
 
-    public function __construct(string $serverUrl, string $username, $apiToken) {
+    public function __construct(string $serverUrl, string $username, string $apiToken)
+    {
         ApiAccessor::init($serverUrl, $username, $apiToken);
         parent::__construct("");
     }
@@ -78,44 +79,51 @@ class Jenkins extends JenkinsEntity {
     /**
      * @return string
      */
-    public function getDescription(): string{
+    public function getDescription(): string
+    {
         return $this->description;
     }
 
     /**
      * @return string
      */
-    public function getMode(): string {
+    public function getMode(): string
+    {
         return $this->mode;
     }
 
     /**
      * @return string
      */
-    public function getNodeDescription(): string {
+    public function getNodeDescription(): string
+    {
         return $this->nodeDescription;
     }
 
     /**
      * @return string
      */
-    public function getNodeName(): string {
+    public function getNodeName(): string
+    {
         return $this->nodeName;
     }
 
     /**
      * @return int
      */
-    public function getNumExecutors(): int{
+    public function getNumExecutors(): int
+    {
         return $this->numExecutors;
     }
 
     /**
      * @return PluginManager
      */
-    public function getPluginManager(): PluginManager {
-        if (is_null($this->pluginManager))
+    public function getPluginManager(): PluginManager
+    {
+        if (is_null($this->pluginManager)) {
             $this->pluginManager = new PluginManager();
+        }
 
         return $this->pluginManager;
     }
@@ -123,12 +131,14 @@ class Jenkins extends JenkinsEntity {
     /**
      * @return Project[]
      */
-    public function getProjects(): array {
+    public function getProjects(): array
+    {
         $jsonProjects = $this->getData()->get("jobs");
-        $projects     = array();
+        $projects = array();
 
-        foreach($jsonProjects as $project)
+        foreach ($jsonProjects as $project) {
             array_push($projects, new Project($project->name));
+        }
 
         return $projects;
     }
@@ -136,7 +146,8 @@ class Jenkins extends JenkinsEntity {
     /**
      * @return int
      */
-    public function getProjectsNb(): int {
+    public function getProjectsNb(): int
+    {
         return count($this->getData()->get("jobs"));
     }
 
@@ -144,10 +155,13 @@ class Jenkins extends JenkinsEntity {
      * @param string $projectName
      * @return Project|null
      */
-    public function getProject(string $projectName) {
-        foreach($this->getData()->get("jobs") as $project)
-            if ($project->name === $projectName)
+    public function getProject(string $projectName)
+    {
+        foreach ($this->getData()->get("jobs") as $project) {
+            if ($project->name === $projectName) {
                 return new Project($project->name);
+            }
+        }
 
         return null;
     }
@@ -155,30 +169,35 @@ class Jenkins extends JenkinsEntity {
     /**
      * @return bool
      */
-    public function isQuietingDown(): bool {
+    public function isQuietingDown(): bool
+    {
         return $this->quietingDown;
     }
 
     /**
      * @return int
      */
-    public function getSlaveAgentPort(): int {
+    public function getSlaveAgentPort(): int
+    {
         return $this->slaveAgentPort;
     }
 
     /**
      * @return bool
      */
-    public function isUsingCrumbs(): bool {
+    public function isUsingCrumbs(): bool
+    {
         return $this->useCrumbs;
     }
 
     /**
      * @return UserManager
      */
-    public function getUserManager(): UserManager {
-        if (is_null($this->userManager))
+    public function getUserManager(): UserManager
+    {
+        if (is_null($this->userManager)) {
             $this->userManager = new UserManager();
+        }
 
         return $this->userManager;
     }
@@ -186,15 +205,16 @@ class Jenkins extends JenkinsEntity {
     /**
      * @return bool
      */
-    public function isUsingSecurity(): bool {
+    public function isUsingSecurity(): bool
+    {
         return $this->useSecurity;
     }
 
     /**
      * @return string Version of the Jenkins server.
      */
-    public function getVersion() {
+    public function getVersion(): string
+    {
         return ApiAccessor::getInstance()->getJenkinsVersion();
     }
-
 }

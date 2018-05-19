@@ -3,12 +3,12 @@
 namespace Utarwyn\Jenkins\Server;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Utarwyn\Jenkins\Helper\JsonData;
 
-
-class ApiAccessor {
-
+class ApiAccessor
+{
     private static $instance;
 
     /**
@@ -41,7 +41,8 @@ class ApiAccessor {
      */
     private $client;
 
-    public function __construct(string $jenkinsUrl, string $username, string $apiToken) {
+    private function __construct(string $jenkinsUrl, string $username, string $apiToken)
+    {
         $this->jenkinsUrl = trim($jenkinsUrl, "/");
         $this->jenkinsUsername = $username;
         $this->jenkinsApiToken = $apiToken;
@@ -54,12 +55,14 @@ class ApiAccessor {
      * @param bool $plain
      * @return null|string|JsonData
      */
-    public function get(string $action, bool $plain = false) {
+    public function get(string $action, bool $plain = false)
+    {
         $response = $this->request("GET", $action);
 
         // Version header.
-        if (is_null($this->jenkinsVersion) && $response->hasHeader("x-jenkins"))
+        if (is_null($this->jenkinsVersion) && $response->hasHeader("x-jenkins")) {
             $this->jenkinsVersion = $response->getHeader("x-jenkins")[0];
+        }
 
         if ($response->getStatusCode() === 200) {
             $content = $response->getBody()->getContents();
@@ -69,28 +72,37 @@ class ApiAccessor {
         return null;
     }
 
-    public function post(string $action, array $params = array()): bool {
+    public function post(string $action, array $params = array()): bool
+    {
         $response = $this->request("POST", $action, $params);
 
         var_dump($response);
         return true;
     }
 
-    public function getJenkinsVersion() {
+    public function getJenkinsVersion()
+    {
         return $this->jenkinsVersion;
     }
 
-    private function request(string $method, string $action, array $params = array()) : ResponseInterface {
+    private function request(string $method, string $action, array $params = array()) : ResponseInterface
+    {
         // Get crumb data to securise the request
         $crumb = $this->getCrumbData();
 
-        return $this->client->request($method, $this->getActionEndpoint($action), array(
-            "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken],
-            "headers" => array(
-                $crumb->getRequestField(), $crumb->getCrumb()
-            ),
-            "form_params" => $params
-        ));
+        var_dump($crumb);
+
+        try {
+            return $this->client->request($method, $this->getActionEndpoint($action), array(
+                "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken],
+                "headers" => array(
+                    $crumb->getRequestField(), $crumb->getCrumb()
+                ),
+                "form_params" => $params
+            ));
+        } catch (GuzzleException $e) {
+            return null;
+        }
     }
 
     /**
@@ -98,7 +110,8 @@ class ApiAccessor {
      * @param string $action Action to run.
      * @return string Endpoint of the action asked in parameter.
      */
-    private function getActionEndpoint(string $action): string {
+    private function getActionEndpoint(string $action): string
+    {
         $action = trim($action, "/");
         $params = "";
 
@@ -110,14 +123,18 @@ class ApiAccessor {
             $action = trim($sp[0], "/");
         }
 
-        if (!empty($action)) $action .= "/";
+        if (!empty($action)) {
+            $action .= "/";
+        }
 
         return "{$this->jenkinsUrl}/{$action}api/json$params";
     }
 
-    private function getCrumbData() : CrumbData {
-        if (!is_null($this->jenkinsCrumbData))
+    private function getCrumbData() : CrumbData
+    {
+        if (!is_null($this->jenkinsCrumbData)) {
             return $this->jenkinsCrumbData;
+        }
 
         $response = $this->client->get($this->getActionEndpoint("crumbIssuer"), array(
             "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken]
@@ -136,15 +153,17 @@ class ApiAccessor {
         return null;
     }
 
-    public static function init(string $jenkinsUrl, string $username, string $apiToken): ApiAccessor {
-        if (is_null(self::$instance))
+    public static function init(string $jenkinsUrl, string $username, string $apiToken): ApiAccessor
+    {
+        if (is_null(self::$instance)) {
             self::$instance = new ApiAccessor($jenkinsUrl, $username, $apiToken);
+        }
 
         return self::$instance;
     }
 
-    public static function getInstance(): ApiAccessor {
+    public static function getInstance(): ApiAccessor
+    {
         return self::$instance;
     }
-
 }
