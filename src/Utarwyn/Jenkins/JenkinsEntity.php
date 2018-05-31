@@ -13,9 +13,9 @@ abstract class JenkinsEntity
      */
     private $data;
 
-    public function __construct(string $objectAction, array $params = array())
+    public function __construct(string $objectAction, $plain=false, array $params = array())
     {
-        $this->loadData($objectAction, $params);
+        $this->loadData($objectAction, $plain, $params);
     }
 
     protected function getData()
@@ -23,11 +23,12 @@ abstract class JenkinsEntity
         return $this->data;
     }
 
-    private function loadData(string $action, array $params)
+    private function loadData(string $action, $plain, array $params)
     {
         $p = empty($params) ? "" : "?" . http_build_query($params);
-        $this->data = ApiAccessor::getInstance()->get($action . $p);
+        $this->data = ApiAccessor::getInstance()->get($action . $p, $plain);
 
+        if (is_null($this->data)) return null;
         foreach (get_object_vars($this) as $variable => $value) {
             if ($variable === "data") {
                 continue;

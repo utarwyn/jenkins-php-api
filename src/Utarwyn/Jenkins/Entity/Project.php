@@ -126,7 +126,7 @@ class Project extends JenkinsEntity
      */
     public function getColor(): string
     {
-        return $this->color;
+        return is_null($this->color) ? "" : $this->color;
     }
 
     /**
@@ -151,7 +151,12 @@ class Project extends JenkinsEntity
      */
     public function getBuild(int $id): Build
     {
-        return new Build($this, $id);
+        try {
+            return new Build($this, $id);
+        }
+        catch (Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -226,6 +231,9 @@ class Project extends JenkinsEntity
         return $this->nextBuildNumber;
     }
 
+    public function getBuilds() {
+        return $this->builds;
+    }
     /**
      * @param Project $project
      * @param $jsonKey
@@ -240,4 +248,5 @@ class Project extends JenkinsEntity
         }
         return new Build($project, $buildObj->number);
     }
+
 }

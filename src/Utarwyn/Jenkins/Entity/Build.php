@@ -142,7 +142,7 @@ class Build extends JenkinsEntity
      */
     public function getId(): int
     {
-        return $this->id;
+        return is_null($this->id) ? 0 : $this->id;
     }
 
     /**
