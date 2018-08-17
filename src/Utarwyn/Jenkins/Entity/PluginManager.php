@@ -4,6 +4,10 @@ namespace Utarwyn\Jenkins\Entity;
 
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
+/**
+ * Class PluginManager
+ * @package Utarwyn\Jenkins\Entity
+ */
 class PluginManager
 {
 

@@ -4,6 +4,10 @@ namespace Utarwyn\Jenkins\Entity;
 
 use ReflectionClass;
 
+/**
+ * Class BuildResult
+ * @package Utarwyn\Jenkins\Entity
+ */
 class BuildResult
 {
     const ABORTED = "ABORTED";

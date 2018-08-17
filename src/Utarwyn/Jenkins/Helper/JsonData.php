@@ -2,6 +2,10 @@
 
 namespace Utarwyn\Jenkins\Helper;
 
+/**
+ * Class JsonData
+ * @package Utarwyn\Jenkins\Helper
+ */
 class JsonData
 {
 

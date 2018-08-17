@@ -15,13 +15,13 @@ class View extends JenkinsEntity
     /**
      * @var string
      */
-    protected  $name;
+    protected $name;
 
-    protected  $url;
+    protected $url;
 
-    protected  $property;
+    protected $property;
 
-    protected  $jobs;
+    protected $jobs;
 
     public function __construct(string $name)
     {

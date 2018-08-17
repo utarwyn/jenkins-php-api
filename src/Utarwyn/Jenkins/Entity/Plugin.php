@@ -2,6 +2,10 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
+/**
+ * Class Plugin
+ * @package Utarwyn\Jenkins\Entity
+ */
 class Plugin
 {
 
@@ -80,6 +84,10 @@ class Plugin
      */
     protected $version;
 
+    /**
+     * Plugin constructor.
+     * @param $jsonData
+     */
     public function __construct($jsonData)
     {
         $this->loadData($jsonData);

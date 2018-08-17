@@ -7,14 +7,16 @@ use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Utarwyn\Jenkins\Helper\JsonData;
 
+/**
+ * Class ApiAccessor
+ * @package Utarwyn\Jenkins\Server
+ */
 class ApiAccessor
 {
-    private static $instance;
-
     /**
-     * @var string URL of Jenkins server.
+     * @var ApiAccessor Instance of the api accessor
      */
-    private $jenkinsUrl;
+    private static $instance;
 
     /**
      * @var string Jenkins API Username.
@@ -41,13 +43,22 @@ class ApiAccessor
      */
     private $client;
 
+    /**
+     * ApiAccessor constructor.
+     * @param string $jenkinsUrl
+     * @param string $username
+     * @param string $apiToken
+     */
     private function __construct(string $jenkinsUrl, string $username, string $apiToken)
     {
-        $this->jenkinsUrl = trim($jenkinsUrl, "/");
         $this->jenkinsUsername = $username;
         $this->jenkinsApiToken = $apiToken;
 
-        $this->client = new Client();
+        // Configure the Guzzle client to access to the remote Jenkins api
+        $this->client = new Client([
+            'base_uri' => trim($jenkinsUrl, "/"),
+            'verify' => false
+        ]);
     }
 
     /**
@@ -72,25 +83,34 @@ class ApiAccessor
         return null;
     }
 
-    public function post(string $action, array $params = array()): bool
+    /**
+     * @param string $action
+     * @param array $params
+     * @return ResponseInterface
+     */
+    public function post(string $action, array $params = array()): ResponseInterface
     {
-        $response = $this->request("POST", $action, $params);
-
-        var_dump($response);
-        return true;
+        return $this->request("POST", $action, $params);
     }
 
+    /**
+     * @return string
+     */
     public function getJenkinsVersion()
     {
         return $this->jenkinsVersion;
     }
 
+    /**
+     * @param string $method
+     * @param string $action
+     * @param array $params
+     * @return ResponseInterface
+     */
     private function request(string $method, string $action, array $params = array()) : ResponseInterface
     {
         // Get crumb data to securise the request
         $crumb = $this->getCrumbData();
-
-        var_dump($crumb);
 
         try {
             return $this->client->request($method, $this->getActionEndpoint($action), array(
@@ -127,9 +147,12 @@ class ApiAccessor
             $action .= "/";
         }
 
-        return "{$this->jenkinsUrl}/{$action}api/json$params";
+        return "/{$action}api/json$params";
     }
 
+    /**
+     * @return CrumbData
+     */
     private function getCrumbData() : CrumbData
     {
         if (!is_null($this->jenkinsCrumbData)) {
@@ -147,12 +170,18 @@ class ApiAccessor
             $this->jenkinsCrumbData = $crumb;
             return $crumb;
         } else {
-            // Throw an error
+            // TODO Throw an error here to inform the user
         }
 
         return null;
     }
 
+    /**
+     * @param string $jenkinsUrl
+     * @param string $username
+     * @param string $apiToken
+     * @return ApiAccessor
+     */
     public static function init(string $jenkinsUrl, string $username, string $apiToken): ApiAccessor
     {
         if (is_null(self::$instance)) {
@@ -162,6 +191,9 @@ class ApiAccessor
         return self::$instance;
     }
 
+    /**
+     * @return ApiAccessor
+     */
     public static function getInstance(): ApiAccessor
     {
         return self::$instance;

@@ -4,6 +4,10 @@ namespace Utarwyn\Jenkins\Entity;
 
 use Utarwyn\Jenkins\JenkinsEntity;
 
+/**
+ * Class UserManager
+ * @package Utarwyn\Jenkins\Entity
+ */
 class UserManager extends JenkinsEntity
 {
 
@@ -12,6 +16,9 @@ class UserManager extends JenkinsEntity
      */
     protected $users;
 
+    /**
+     * UserManager constructor.
+     */
     public function __construct()
     {
         parent::__construct("asynchPeople");

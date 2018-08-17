@@ -2,8 +2,13 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
+use Exception;
 use Utarwyn\Jenkins\JenkinsEntity;
 
+/**
+ * Class Project
+ * @package Utarwyn\Jenkins\Entity
+ */
 class Project extends JenkinsEntity
 {
 
@@ -153,8 +158,7 @@ class Project extends JenkinsEntity
     {
         try {
             return new Build($this, $id);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }
@@ -231,7 +235,8 @@ class Project extends JenkinsEntity
         return $this->nextBuildNumber;
     }
 
-    public function getBuilds() {
+    public function getBuilds()
+    {
         return $this->builds;
     }
     /**
@@ -248,5 +253,4 @@ class Project extends JenkinsEntity
         }
         return new Build($project, $buildObj->number);
     }
-
 }

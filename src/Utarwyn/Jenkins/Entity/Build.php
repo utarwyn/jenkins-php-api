@@ -5,6 +5,10 @@ namespace Utarwyn\Jenkins\Entity;
 use Utarwyn\Jenkins\JenkinsEntity;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
+/**
+ * Class Build
+ * @package Utarwyn\Jenkins\Entity
+ */
 class Build extends JenkinsEntity
 {
 
@@ -83,6 +87,11 @@ class Build extends JenkinsEntity
      */
     protected $builtOn;
 
+    /**
+     * Build constructor.
+     * @param Project $project
+     * @param int $buildId
+     */
     public function __construct(Project $project, int $buildId)
     {
         parent::__construct("job/{$project->getName()}/$buildId");
@@ -171,6 +180,7 @@ class Build extends JenkinsEntity
 
     /**
      * @return BuildResult
+     * @throws \ReflectionException
      */
     public function getResult()
     {
@@ -201,7 +211,7 @@ class Build extends JenkinsEntity
         return $this->builtOn;
     }
 
-    /*
+    /**
      * @return string
      */
     public function getConsoleOutput()

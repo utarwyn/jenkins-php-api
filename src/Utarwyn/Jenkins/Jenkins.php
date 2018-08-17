@@ -4,10 +4,14 @@ namespace Utarwyn\Jenkins;
 
 use Utarwyn\Jenkins\Entity\PluginManager;
 use Utarwyn\Jenkins\Entity\Project;
-use Utarwyn\Jenkins\Entity\View;
 use Utarwyn\Jenkins\Entity\UserManager;
+use Utarwyn\Jenkins\Entity\View;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
+/**
+ * Class Jenkins
+ * @package Utarwyn\Jenkins
+ */
 class Jenkins extends JenkinsEntity
 {
 
@@ -148,12 +152,14 @@ class Jenkins extends JenkinsEntity
     {
         $jsonProjects = $this->getData()->get("views");
         $views = array();
+
         foreach ($jsonProjects as $view) {
             array_push($views, new View($view->name));
         }
 
         return $views;
     }
+
     /**
      * @return int
      */

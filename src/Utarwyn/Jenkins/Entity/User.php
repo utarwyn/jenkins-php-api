@@ -5,6 +5,10 @@ namespace Utarwyn\Jenkins\Entity;
 use Utarwyn\Jenkins\JenkinsEntity;
 use Utarwyn\Jenkins\Server\ApiAccessor;
 
+/**
+ * Class User
+ * @package Utarwyn\Jenkins\Entity
+ */
 class User extends JenkinsEntity
 {
 
