@@ -79,7 +79,7 @@ class Project extends JenkinsEntity
     }
 
     /**
-     * @return string
+     * @return string Description
      */
     public function getDescription(): string
     {

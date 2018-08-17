@@ -29,6 +29,7 @@
         "phpunit/phpunit": "^7.1",
         "phpro/grumphp": "^0.14.0",
         "jakub-onderka/php-parallel-lint": "^1.0",
-        "friendsofphp/php-cs-fixer": "^2.11"
+        "friendsofphp/php-cs-fixer": "^2.11",
+        "evert/phpdoc-md" : "~0.2.0"
     }
 }
