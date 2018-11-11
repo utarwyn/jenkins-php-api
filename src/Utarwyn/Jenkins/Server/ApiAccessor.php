@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use Utarwyn\Jenkins\Helper\JsonData;
+use Utarwyn\Jenkins\Error\ConnectionErrorException;
 
 /**
  * Class ApiAccessor
@@ -17,6 +18,11 @@ class ApiAccessor
      * @var ApiAccessor Instance of the api accessor
      */
     private static $instance;
+
+    /**
+     * @var string Jenkins base URL
+     */
+    private $jenkinsUrl;
 
     /**
      * @var string Jenkins API Username.
@@ -51,12 +57,13 @@ class ApiAccessor
      */
     private function __construct(string $jenkinsUrl, string $username, string $apiToken)
     {
+        $this->jenkinsUrl = $jenkinsUrl;
         $this->jenkinsUsername = $username;
         $this->jenkinsApiToken = $apiToken;
 
         // Configure the Guzzle client to access to the remote Jenkins api
         $this->client = new Client([
-            'base_uri' => trim($jenkinsUrl, "/"),
+            'base_uri' => $jenkinsUrl,
             'verify' => false
         ]);
     }
@@ -126,28 +133,28 @@ class ApiAccessor
     }
 
     /**
-     * Generate the Jenkins URL with an action.
+     * Generate the Jenkins API endpoint of an action.
      * @param string $action Action to run.
      * @return string Endpoint of the action asked in parameter.
      */
     private function getActionEndpoint(string $action): string
     {
-        $action = trim($action, "/");
-        $params = "";
+        $action = trim($action, '/');
+        $params = '';
 
-        // Add parameters add the end.
-        if (strpos($action, "?") !== false) {
+        if (strpos($action, '?') !== false) {
+            // Add parameters at the end of the url
             $sp = preg_split("/\?/", $action, 2);
 
-            $params = "?" . $sp[1];
-            $action = trim($sp[0], "/");
+            $params = '?' . $sp[1];
+            $action = trim($sp[0], '/');
         }
 
         if (!empty($action)) {
-            $action .= "/";
+            $action .= '/';
         }
 
-        return "/{$action}api/json$params";
+        return "{$action}api/json$params";
     }
 
     /**
@@ -163,17 +170,21 @@ class ApiAccessor
             "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken]
         ));
 
-        if ($response->getStatusCode() === 200) {
-            $data = \GuzzleHttp\json_decode($response->getBody()->getContents());
-            $crumb = new CrumbData($data->crumbRequestField, $data->crumb);
+        try {
+            $status = $response->getStatusCode();
 
-            $this->jenkinsCrumbData = $crumb;
-            return $crumb;
-        } else {
-            // TODO Throw an error here to inform the user
+            if ($status === 200) {
+                $data = \GuzzleHttp\json_decode($response->getBody()->getContents());
+                $crumb = new CrumbData($data->crumbRequestField, $data->crumb);
+    
+                $this->jenkinsCrumbData = $crumb;
+                return $crumb;
+            } else {
+                throw new ConnectionErrorException("{$this->jenkinsUrl} returns a {$status} HTTP code");
+            }
+        } catch (\Exception | \InvalidArgumentException $e) {
+            throw new ConnectionErrorException("Jenkins instance not found at {$this->jenkinsUrl}");
         }
-
-        return null;
     }
 
     /**

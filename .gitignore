@@ -1,5 +1,6 @@
-# Intellij
+# Code editors
 /.idea
+/.vscode
 *.iml
 
 # Composer
