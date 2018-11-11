@@ -6,7 +6,7 @@ use Utarwyn\Jenkins\Entity\PluginManager;
 use Utarwyn\Jenkins\Entity\Project;
 use Utarwyn\Jenkins\Entity\UserManager;
 use Utarwyn\Jenkins\Entity\View;
-use Utarwyn\Jenkins\Server\ApiAccessor;
+use Utarwyn\Jenkins\Server\ApiClient;
 
 /**
  * Class Jenkins
@@ -14,6 +14,10 @@ use Utarwyn\Jenkins\Server\ApiAccessor;
  */
 class Jenkins extends JenkinsEntity
 {
+    /**
+     * @var ApiClient Object to access to the Jenkins API
+     */
+    protected $client;
 
     /**
      * @var string
@@ -77,8 +81,8 @@ class Jenkins extends JenkinsEntity
 
     public function __construct(string $serverUrl, string $username, string $apiToken)
     {
-        ApiAccessor::init($serverUrl, $username, $apiToken);
-        parent::__construct("");
+        $this->client = new ApiClient($serverUrl, $username, $apiToken);
+        parent::__construct($this->client, "");
     }
 
     /**
@@ -127,7 +131,7 @@ class Jenkins extends JenkinsEntity
     public function getPluginManager(): PluginManager
     {
         if (is_null($this->pluginManager)) {
-            $this->pluginManager = new PluginManager();
+            $this->pluginManager = new PluginManager($this->client);
         }
 
         return $this->pluginManager;
@@ -138,11 +142,10 @@ class Jenkins extends JenkinsEntity
      */
     public function getProjects(): array
     {
-        $jsonProjects = $this->getData()->get("jobs");
         $projects = array();
 
-        foreach ($jsonProjects as $project) {
-            array_push($projects, new Project($project->name));
+        foreach ($this->getData()->jobs as $project) {
+            array_push($projects, new Project($this->client, $project->name));
         }
 
         return $projects;
@@ -150,11 +153,11 @@ class Jenkins extends JenkinsEntity
 
     public function getViews()
     {
-        $jsonProjects = $this->getData()->get("views");
+        $jsonProjects = $this->getData()->views;
         $views = array();
 
         foreach ($jsonProjects as $view) {
-            array_push($views, new View($view->name));
+            array_push($views, new View($this->client, $view->name));
         }
 
         return $views;
@@ -165,7 +168,7 @@ class Jenkins extends JenkinsEntity
      */
     public function getProjectsNb(): int
     {
-        return count($this->getData()->get("jobs"));
+        return count($this->getData()->jobs);
     }
 
     /**
@@ -174,9 +177,9 @@ class Jenkins extends JenkinsEntity
      */
     public function getProject(string $projectName)
     {
-        foreach ($this->getData()->get("jobs") as $project) {
+        foreach ($this->getData()->jobs as $project) {
             if ($project->name === $projectName) {
-                return new Project($project->name);
+                return new Project($this->client, $project->name);
             }
         }
 
@@ -185,9 +188,9 @@ class Jenkins extends JenkinsEntity
 
     public function getView(string $viewName)
     {
-        foreach ($this->getData()->get("views") as $view) {
+        foreach ($this->getData()->views as $view) {
             if ($view->name === $viewName) {
-                return new View($view->name);
+                return new View($this->client, $view->name);
             }
         }
 
@@ -224,7 +227,7 @@ class Jenkins extends JenkinsEntity
     public function getUserManager(): UserManager
     {
         if (is_null($this->userManager)) {
-            $this->userManager = new UserManager();
+            $this->userManager = new UserManager($this->client);
         }
 
         return $this->userManager;
@@ -243,6 +246,6 @@ class Jenkins extends JenkinsEntity
      */
     public function getVersion(): string
     {
-        return ApiAccessor::getInstance()->getJenkinsVersion();
+        return $this->client->getJenkinsVersion();
     }
 }

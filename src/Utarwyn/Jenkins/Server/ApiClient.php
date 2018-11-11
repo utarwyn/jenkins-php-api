@@ -5,20 +5,14 @@ namespace Utarwyn\Jenkins\Server;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
-use Utarwyn\Jenkins\Helper\JsonData;
 use Utarwyn\Jenkins\Error\ConnectionErrorException;
 
 /**
- * Class ApiAccessor
+ * Class ApiClient
  * @package Utarwyn\Jenkins\Server
  */
-class ApiAccessor
+class ApiClient
 {
-    /**
-     * @var ApiAccessor Instance of the api accessor
-     */
-    private static $instance;
-
     /**
      * @var string Jenkins base URL
      */
@@ -35,7 +29,7 @@ class ApiAccessor
     private $jenkinsApiToken;
 
     /**
-     * @var CrumbData
+     * @var CrumbData Data used by the API to identified an user.
      */
     private $jenkinsCrumbData;
 
@@ -50,12 +44,12 @@ class ApiAccessor
     private $client;
 
     /**
-     * ApiAccessor constructor.
-     * @param string $jenkinsUrl
-     * @param string $username
-     * @param string $apiToken
+     * ApiClient constructor.
+     * @param string $jenkinsUrl Jenkins base URL
+     * @param string $username Username to connect to the Jenkins API
+     * @param string $apiToken Token to connect to the Jenkins API
      */
-    private function __construct(string $jenkinsUrl, string $username, string $apiToken)
+    public function __construct(string $jenkinsUrl, string $username, string $apiToken)
     {
         $this->jenkinsUrl = $jenkinsUrl;
         $this->jenkinsUsername = $username;
@@ -69,9 +63,9 @@ class ApiAccessor
     }
 
     /**
-     * @param string $action
-     * @param bool $plain
-     * @return null|string|JsonData
+     * @param string $action Action where we want information
+     * @param bool $plain Should data be retreived in the plain format?
+     * @return Object|string|null Returned data by the API
      */
     public function get(string $action, bool $plain = false)
     {
@@ -84,16 +78,16 @@ class ApiAccessor
 
         if ($response->getStatusCode() === 200) {
             $content = $response->getBody()->getContents();
-            return ($plain) ? $content : new JsonData($content);
+            return (!$plain) ? json_decode($content) : $content;
         }
 
         return null;
     }
 
     /**
-     * @param string $action
-     * @param array $params
-     * @return ResponseInterface
+     * @param string $action Action where we want to post information
+     * @param array $params Params to post to the Jenkins action
+     * @return ResponseInterface The response of the Jenkins API
      */
     public function post(string $action, array $params = array()): ResponseInterface
     {
@@ -101,7 +95,7 @@ class ApiAccessor
     }
 
     /**
-     * @return string
+     * @return string Version of the Jenkins instance
      */
     public function getJenkinsVersion()
     {
@@ -109,10 +103,10 @@ class ApiAccessor
     }
 
     /**
-     * @param string $method
-     * @param string $action
-     * @param array $params
-     * @return ResponseInterface
+     * @param string $method HTTP Method of the request
+     * @param string $action Action where the request has to be done
+     * @param array $params Params to pass through the request
+     * @return ResponseInterface The response of the Jenkins API
      */
     private function request(string $method, string $action, array $params = array()) : ResponseInterface
     {
@@ -134,8 +128,8 @@ class ApiAccessor
 
     /**
      * Generate the Jenkins API endpoint of an action.
-     * @param string $action Action to run.
-     * @return string Endpoint of the action asked in parameter.
+     * @param string $action Path to resolve inside the Jenkins API
+     * @return string Formatted action endpoint
      */
     private function getActionEndpoint(string $action): string
     {
@@ -158,7 +152,7 @@ class ApiAccessor
     }
 
     /**
-     * @return CrumbData
+     * @return CrumbData Authentication data used by the Jenkins API
      */
     private function getCrumbData() : CrumbData
     {
@@ -185,28 +179,5 @@ class ApiAccessor
         } catch (\Exception | \InvalidArgumentException $e) {
             throw new ConnectionErrorException("Jenkins instance not found at {$this->jenkinsUrl}");
         }
-    }
-
-    /**
-     * @param string $jenkinsUrl
-     * @param string $username
-     * @param string $apiToken
-     * @return ApiAccessor
-     */
-    public static function init(string $jenkinsUrl, string $username, string $apiToken): ApiAccessor
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new ApiAccessor($jenkinsUrl, $username, $apiToken);
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * @return ApiAccessor
-     */
-    public static function getInstance(): ApiAccessor
-    {
-        return self::$instance;
     }
 }

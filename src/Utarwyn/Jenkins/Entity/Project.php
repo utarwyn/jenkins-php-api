@@ -73,9 +73,9 @@ class Project extends JenkinsEntity
      */
     protected $concurrentBuild;
 
-    public function __construct(string $name)
+    public function __construct($client, string $name)
     {
-        parent::__construct("job/$name");
+        parent::__construct($client, "job/$name");
     }
 
     /**
@@ -246,11 +246,12 @@ class Project extends JenkinsEntity
      */
     private static function getBuildFromJson(Project $project, $jsonKey)
     {
-        $buildObj = $project->getData()->get($jsonKey);
+        $buildObj = $project->getData()->$jsonKey;
 
         if (empty($buildObj)) {
             return null;
         }
-        return new Build($project, $buildObj->number);
+
+        return new Build($this->client, $project, $buildObj->number);
     }
 }

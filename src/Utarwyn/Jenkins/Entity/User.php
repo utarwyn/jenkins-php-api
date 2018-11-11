@@ -38,12 +38,12 @@ class User extends JenkinsEntity
     private $views;
 
 
-    public function __construct(\StdClass $userObj)
+    public function __construct($client, \StdClass $userObj)
     {
-        parent::__construct("user/{$userObj->user->fullName}");
+        parent::__construct($client, "user/{$userObj->user->fullName}");
 
         // Init user properties
-        foreach ($this->getData()->get("property") as $property) {
+        foreach ($this->getData()->property as $property) {
             foreach ($property as $key => $value) {
                 if (property_exists($this, $key)) {
                     $this->$key = $value;
@@ -93,10 +93,10 @@ class User extends JenkinsEntity
             return $this->views;
         }
 
-        $viewsJson = ApiAccessor::getInstance()->get("user/{$this->id}/my-views");
+        $views = $this->client->get("user/{$this->id}/my-views");
 
-        foreach ($viewsJson->get("jobs") as $job) {
-            $this->views[] = new Project($job->name);
+        foreach ($views->jobs as $job) {
+            $this->views[] = new Project($this->client, $job->name);
         }
 
         return $this->views;
@@ -111,7 +111,6 @@ class User extends JenkinsEntity
             return count($this->views);
         }
 
-        $viewsJson = ApiAccessor::getInstance()->get("user/{$this->id}/my-views");
-        return count($viewsJson->get("jobs"));
+        return count($this->client->get("user/{$this->id}/my-views")->jobs);
     }
 }

@@ -3,7 +3,7 @@
 namespace Utarwyn\Jenkins\Entity;
 
 use Utarwyn\Jenkins\JenkinsEntity;
-use Utarwyn\Jenkins\Server\ApiAccessor;
+use Utarwyn\Jenkins\Server\ApiClient;
 
 /**
  * Class Build
@@ -89,12 +89,13 @@ class Build extends JenkinsEntity
 
     /**
      * Build constructor.
+     * @param ApiClient $client
      * @param Project $project
      * @param int $buildId
      */
-    public function __construct(Project $project, int $buildId)
+    public function __construct($client, Project $project, int $buildId)
     {
-        parent::__construct("job/{$project->getName()}/$buildId");
+        parent::__construct($client, "job/{$project->getName()}/$buildId");
         $this->project = $project;
     }
 
@@ -216,6 +217,6 @@ class Build extends JenkinsEntity
      */
     public function getConsoleOutput()
     {
-        return ApiAccessor::getInstance()->get("job/{$this->project->getName()}/{$this->id}/consoleText", true);
+        return $this->client->get("job/{$this->project->getName()}/{$this->id}/consoleText", true);
     }
 }

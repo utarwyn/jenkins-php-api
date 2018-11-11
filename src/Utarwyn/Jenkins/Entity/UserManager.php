@@ -19,9 +19,9 @@ class UserManager extends JenkinsEntity
     /**
      * UserManager constructor.
      */
-    public function __construct()
+    public function __construct($client)
     {
-        parent::__construct("asynchPeople");
+        parent::__construct($client, "asynchPeople");
     }
 
     /**
@@ -67,6 +67,6 @@ class UserManager extends JenkinsEntity
         if ($userObj == null) {
             return null;
         }
-        return new User($userObj);
+        return new User($this->client, $userObj);
     }
 }

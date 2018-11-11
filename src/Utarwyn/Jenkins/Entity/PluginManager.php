@@ -2,25 +2,30 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
-use Utarwyn\Jenkins\Server\ApiAccessor;
+use Utarwyn\Jenkins\JenkinsEntity;
+use Utarwyn\Jenkins\Server\ApiClient;
 
 /**
  * Class PluginManager
  * @package Utarwyn\Jenkins\Entity
  */
-class PluginManager
+class PluginManager extends JenkinsEntity
 {
-
     /**
      * @var Plugin[] Plugins
      */
-    protected $plugins;
+    protected $_plugins;
 
     /**
      * PluginManager constructor.
+     * @param ApiClient $client Client to access to the API
      */
-    public function __construct()
+    public function __construct(ApiClient $client)
     {
+        parent::__construct($client, 'pluginManager', array(
+            'depth' => 5
+        ));
+
         $this->load();
     }
 
@@ -29,7 +34,7 @@ class PluginManager
      */
     public function getNbPlugins()
     {
-        return count($this->plugins);
+        return count($this->_plugins);
     }
 
     /**
@@ -38,7 +43,7 @@ class PluginManager
      */
     public function getPlugin(string $name)
     {
-        foreach ($this->plugins as $plugin) {
+        foreach ($this->_plugins as $plugin) {
             if ($plugin->getShortName() == $name) {
                 return $plugin;
             }
@@ -52,10 +57,10 @@ class PluginManager
      */
     private function load()
     {
-        $json = ApiAccessor::getInstance()->get("pluginManager?depth=5");
+        $json = $this->getData();
 
-        foreach ($json->get("plugins") as $pluginObj) {
-            $this->plugins[] = new Plugin($pluginObj);
+        foreach ($json->plugins as $plugin) {
+            $this->_plugins[] = new Plugin($plugin);
         }
     }
 }

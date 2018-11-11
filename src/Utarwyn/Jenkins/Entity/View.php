@@ -23,9 +23,9 @@ class View extends JenkinsEntity
 
     protected $jobs;
 
-    public function __construct(string $name)
+    public function __construct($client, string $name)
     {
-        parent::__construct("view/$name");
+        parent::__construct($client, "view/$name");
     }
 
     /**
