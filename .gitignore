@@ -10,3 +10,6 @@ composer.lock
 
 # Cache files
 *.cache
+
+# The test file
+test.php
