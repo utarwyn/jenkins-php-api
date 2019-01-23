@@ -134,6 +134,11 @@ class Project extends JenkinsEntity
         return is_null($this->color) ? "" : $this->color;
     }
 
+    public function getHealthReport(): array
+    {
+        return $this->healthReport;
+    }
+
     /**
      * @return bool
      */

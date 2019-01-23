@@ -79,7 +79,7 @@ class Jenkins extends JenkinsEntity
      */
     protected $useSecurity;
 
-    public function __construct(string $serverUrl, string $username, string $apiToken)
+    public function __construct(string $serverUrl, string $username = "", string $apiToken = "")
     {
         $this->client = new ApiClient($serverUrl, $username, $apiToken);
         parent::__construct($this->client, "");

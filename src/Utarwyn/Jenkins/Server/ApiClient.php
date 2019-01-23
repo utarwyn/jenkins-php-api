@@ -114,15 +114,22 @@ class ApiClient
         $crumb = $this->getCrumbData();
 
         try {
-            return $this->client->request($method, $this->getActionEndpoint($action), array(
-                "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken],
+            $params = array(
                 "headers" => array(
                     $crumb->getRequestField(), $crumb->getCrumb()
                 ),
                 "form_params" => $params
-            ));
+            );
+
+            // Ajout de l'en-tête d'authentification si la connexion est nécessaire
+            if (!empty($this->jenkinsUsername) && !empty($this->jenkinsApiToken)) {
+                $params['auth'] = [$this->jenkinsUsername, $this->jenkinsApiToken];
+            }
+
+            return $this->client->request($method, $this->getActionEndpoint($action), $params);
         } catch (GuzzleException $e) {
-            return null;
+            $r = $e->getResponse();
+            throw new ConnectionErrorException("{$r->getStatusCode()} error ({$r->getReasonPhrase()}) when trying to access action {$action}.");
         }
     }
 
@@ -160,9 +167,14 @@ class ApiClient
             return $this->jenkinsCrumbData;
         }
 
-        $response = $this->client->get($this->getActionEndpoint("crumbIssuer"), array(
-            "auth" => [$this->jenkinsUsername, $this->jenkinsApiToken]
-        ));
+        $params = array();
+
+        // Ajout de l'en-tête d'authentification si nécessaire
+        if (!empty($this->jenkinsUsername) && !empty($this->jenkinsApiToken)) {
+            $params['auth'] = [$this->jenkinsUsername, $this->jenkinsApiToken];
+        }
+
+        $response = $this->client->get($this->getActionEndpoint('crumbIssuer'), $params);
 
         try {
             $status = $response->getStatusCode();
