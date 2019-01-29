@@ -2,6 +2,7 @@
 
 namespace Utarwyn\Jenkins;
 
+use Utarwyn\Jenkins\Entity\Queue;
 use Utarwyn\Jenkins\Entity\PluginManager;
 use Utarwyn\Jenkins\Entity\Project;
 use Utarwyn\Jenkins\Entity\UserManager;
@@ -43,6 +44,11 @@ class Jenkins extends JenkinsEntity
      * @var integer
      */
     protected $numExecutors;
+
+    /**
+     * @var Queue
+     */
+    private $queue;
 
     /**
      * @var PluginManager
@@ -123,6 +129,18 @@ class Jenkins extends JenkinsEntity
     public function getNumExecutors(): int
     {
         return $this->numExecutors;
+    }
+
+    /**
+     * @return Queue
+     */
+    public function getQueue(): Queue
+    {
+        if (is_null($this->queue)) {
+            $this->queue = new Queue($this->client);
+        }
+
+        return $this->queue;
     }
 
     /**

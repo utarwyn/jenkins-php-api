@@ -37,6 +37,17 @@ class PluginManager extends JenkinsEntity
         return count($this->_plugins);
     }
 
+    public function getPluginsNames()
+    {
+        $names = array();
+
+        foreach ($this->_plugins as $plugin) {
+            $names[] = $plugin->getShortName();
+        }
+
+        return $names;
+    }
+
     /**
      * @param $name string The name of the plugin to search.
      * @return null|Plugin The searched plugin or null if not found.

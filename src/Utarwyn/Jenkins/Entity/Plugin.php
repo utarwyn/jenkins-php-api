@@ -2,13 +2,14 @@
 
 namespace Utarwyn\Jenkins\Entity;
 
+use Utarwyn\Jenkins\JenkinsObject;
+
 /**
  * Class Plugin
  * @package Utarwyn\Jenkins\Entity
  */
-class Plugin
+class Plugin extends JenkinsObject
 {
-
     /**
      * @var bool
      */
@@ -86,11 +87,11 @@ class Plugin
 
     /**
      * Plugin constructor.
-     * @param $jsonData
+     * @param $data
      */
-    public function __construct($jsonData)
+    public function __construct($data)
     {
-        $this->loadData($jsonData);
+        parent::__construct($data);
     }
 
     /**
@@ -211,16 +212,5 @@ class Plugin
     public function getVersion(): string
     {
         return $this->version;
-    }
-
-    /**
-     * Allows to create the Plugin object from a JSON Object.
-     * @param $jsonData \StdClass The JSON data.
-     */
-    private function loadData($jsonData)
-    {
-        foreach (get_object_vars($this) as $variable => $value) {
-            $this->$variable = $jsonData->$variable;
-        }
     }
 }
